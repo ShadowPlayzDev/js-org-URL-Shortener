@@ -122,39 +122,22 @@
 
             if (shortId) {
                 mainContainer.innerHTML = `
-                    <h1>Redirecting... (Conceptual)</h1>
-                    <p class="info-message">
-                        Attempting to use short ID: <strong>${shortId}</strong><br>
-                        This is a conceptual demonstration. In a real URL shortener,
-                        this ID would be looked up in a database on a server,
-                        and then a redirect would occur.
-                    </p>
-                    <p>
-                        <strong>Functionality not implemented:</strong> GitHub Pages cannot
-                        perform server-side lookups or redirects.
-                    </p>
-                    <p>
-                        To go to the URL generation page, <a href="${window.location.origin}${window.location.pathname}">click here</a>.
-                    </p>
+                    <h1>Redirecting...</h1>
+                    <p class="info-message">Attempting to use short ID: <strong>${shortId}</strong><br></p>
+                    <p>To go to the URL generation page, <a href="${window.location.origin}${window.location.pathname}">click here</a>.</p>
                 `;
-                console.log(`URL parameter 'url' found with ID: ${shortId}. Redirection functionality not implemented here as it requires a backend database lookup.`);
+                console.log(`URL parameter 'url' found with ID: ${shortId}.`);
 
             } else {
                 mainContainer.innerHTML = `
-                    <h1>Generate Your Short URL</h1>
-                    <p class="info-message">
-                        This section generates a *hypothetical* short URL.
-                        For this short URL to actually *work* (i.e., redirect),
-                        you would need a backend service (like Vercel functions with a database)
-                        to handle the redirection logic.
-                    </p>
-                    <input type="text" id="longUrlInput" placeholder="Enter your long URL here (e.g., https://example.com/very/long/path)">
+                    <h1>ShortURL</h1><h4>Generate the shortest url possible!</h4>
+                    <p class="info-message"></p>
+                    <input type="text" id="longUrlInput" placeholder="Enter your long URL here:">
                     <button id="shortenButton">Generate Short URL</button>
                     <div id="result" class="result">
-                        <p>Hypothetical Shortened URL:</p>
+                        <p>Shortened URL:</p>
                         <a id="shortenedLink" href="#" target="_blank"></a>
-                        <button id="copyButton">Copy</button>
-                    </div>
+                        <button id="copyButton">Copy</button></div>
                     <p id="errorMessage" class="error-message"></p>
                 `;
 
@@ -185,12 +168,12 @@
                         shortenedLink.href = longUrl;
                         shortenedLink.textContent = hypotheticalShortUrl;
                         resultDiv.style.display = 'block';
-                        console.log(`Generated hypothetical short URL: ${hypotheticalShortUrl} for long URL: ${longUrl}.`);
+                        console.log(`Generated short URL: ${hypotheticalShortUrl} for long URL: ${longUrl}.`);
                         console.log(`This short URL is NOT functional for redirection on GitHub Pages alone.`);
 
                     } catch (error) {
                         console.error('Error:', error);
-                        errorMessage.textContent = 'Please enter a valid URL (e.g., https://example.com).';
+                        errorMessage.textContent = 'Please enter a valid URL.';
                     }
                 });
 
