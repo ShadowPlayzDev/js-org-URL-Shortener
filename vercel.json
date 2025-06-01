@@ -2,8 +2,8 @@
   "version": 2,
   "rewrites": [
     {
-      "source": "/api/:call",
-      "destination": "/api/:call.js"
+      "source": "/api/:path",
+      "destination": "/api/:path.js"
     },
     {
       "source": "/:shortCode",
