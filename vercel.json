@@ -1,1 +1,13 @@
-{"version":2}
+{
+  "version": 2,
+  "rewrites": [
+    {
+      "source": "/api/:call",
+      "destination": "/api/:call.js"
+    },
+    {
+      "source": "/:shortCode",
+      "destination": "/index.html?url=:shortCode"
+    }
+  ]
+}
