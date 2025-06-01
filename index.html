@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Short URL</title>
+    <title>Short URL Generator</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -29,6 +29,12 @@
 
         h1 {
             color: #333;
+            margin-bottom: 10px;
+        }
+
+        h4 {
+            color: #666;
+            margin-top: 0;
             margin-bottom: 25px;
         }
 
@@ -66,6 +72,7 @@
             border: 1px solid #dee2e6;
             display: none;
             word-wrap: break-word;
+            text-align: left;
         }
 
         .result p {
@@ -112,34 +119,48 @@
 </head>
 <body>
     <div class="container" id="mainContainer">
-    </div>
+        </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const mainContainer = document.getElementById('mainContainer');
             const urlParams = new URLSearchParams(window.location.search);
-            const shortId = urlParams.get('url');
+            const shortCodeFromQuery = urlParams.get('url');
 
-            if (shortId) {
+            // WARNING: Storing API keys directly in client-side JS is INSECURE for production.
+            // This is for demonstration to meet the "no package.json" and "frontend API key" request.
+            // For a real app, you would proxy requests or use a more robust auth.
+            const FRONTEND_API_KEY = "YOUR_SUPER_SECRET_GENERATE_API_KEY"; // <<<--- IMPORTANT: REPLACE THIS!
+
+            if (shortCodeFromQuery) {
+                // This part of index.html is for displaying info when a query param is used.
+                // The actual redirection for /shortcode paths will be handled by api/redirect.js
                 mainContainer.innerHTML = `
                     <h1>Redirecting...</h1>
-                    <p class="info-message">Attempting to use short ID: <strong>${shortId}</strong><br></p>
-                    <p>To go to the URL generation page, <a href="${window.location.origin}${window.location.pathname}">click here</a>.</p>
+                    <p class="info-message">
+                        Attempting to find content for short ID: <strong>${shortCodeFromQuery}</strong>
+                        <br>This page handles URLs with a query parameter. For direct short URLs (e.g., /${shortCodeFromQuery}),
+                        a Vercel Serverless Function (<code>api/redirect.js</code>) handles the redirection.
+                    </p>
+                    <p>To go to the URL generation page, <a href="${window.location.origin}">click here</a>.</p>
                 `;
-                console.log(`URL parameter 'url' found with ID: ${shortId}.`);
-
+                console.log(`URL parameter 'url' found with ID: ${shortCodeFromQuery}.`);
             } else {
                 mainContainer.innerHTML = `
-                    <h1>ShortURL</h1><h4>Generate the shortest url possible!</h4>
+                    <h1>ShortURL</h1>
+                    <h4>Generate the shortest URL possible!</h4>
                     <p class="info-message"></p>
                     <input type="text" id="longUrlInput" placeholder="Enter your long URL here:">
                     <button id="shortenButton">Generate Short URL</button>
                     <div id="result" class="result">
                         <p>Shortened URL:</p>
                         <a id="shortenedLink" href="#" target="_blank"></a>
-                        <button id="copyButton">Copy</button></div>
+                        <button id="copyButton">Copy</button>
+                    </div>
                     <p id="errorMessage" class="error-message"></p>
-                    <p>Please note that some file types may be denied. These include executables, scripts, and archives.</p>
+                    <p class="info-message" style="font-size: 12px; margin-top: 20px;">
+                        Note: Some file types (.exe, .msi, etc.) and FTP links are denied.
+                    </p>
                 `;
 
                 const longUrlInput = document.getElementById('longUrlInput');
@@ -149,7 +170,7 @@
                 const copyButton = document.getElementById('copyButton');
                 const errorMessage = document.getElementById('errorMessage');
 
-                shortenButton.addEventListener('click', () => {
+                shortenButton.addEventListener('click', async () => {
                     const longUrl = longUrlInput.value.trim();
                     resultDiv.style.display = 'none';
                     errorMessage.textContent = '';
@@ -160,21 +181,30 @@
                     }
 
                     try {
-                        new URL(longUrl);
+                        const response = await fetch('/api/generate', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${FRONTEND_API_KEY}`
+                            },
+                            body: JSON.stringify({ longUrl: longUrl })
+                        });
 
-                        const randomId = Math.random().toString(36).substring(2, 9);
+                        const data = await response.json();
 
-                        const hypotheticalShortUrl = `${window.location.origin}${window.location.pathname}?url=${randomId}`;
-
-                        shortenedLink.href = longUrl;
-                        shortenedLink.textContent = hypotheticalShortUrl;
-                        resultDiv.style.display = 'block';
-                        console.log(`Generated short URL: ${hypotheticalShortUrl} for long URL: ${longUrl}.`);
-                        console.log(`This short URL is NOT functional for redirection on GitHub Pages alone.`);
+                        if (response.ok) {
+                            shortenedLink.href = data.shortUrl;
+                            shortenedLink.textContent = data.shortUrl;
+                            resultDiv.style.display = 'block';
+                            console.log(`Successfully shortened URL: ${data.shortUrl}`);
+                        } else {
+                            errorMessage.textContent = `Error: ${data.message || 'Something went wrong.'}`;
+                            console.error('API Error:', data.message);
+                        }
 
                     } catch (error) {
-                        console.error('Error:', error);
-                        errorMessage.textContent = 'Please enter a valid URL.';
+                        console.error('Network or unexpected error:', error);
+                        errorMessage.textContent = 'Could not connect to the shortening service. Please try again.';
                     }
                 });
 
