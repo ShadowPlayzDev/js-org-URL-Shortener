@@ -1,13 +1,27 @@
 {
-  "version": 2,
-  "rewrites": [
+  "builds": [
     {
-      "source": "/api/:path",
-      "destination": "/api/:path.js"
+      "src": "public/**",
+      "use": "@vercel/static-build"
     },
     {
-      "source": "/:shortCode",
-      "destination": "/index.html?url=:shortCode"
+      "src": "api/*.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/generate",
+      "dest": "/api/generate.js",
+      "methods": ["POST"]
+    },
+    {
+      "src": "/",
+      "dest": "/public/index.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/api/redirect.js"
     }
   ]
 }
