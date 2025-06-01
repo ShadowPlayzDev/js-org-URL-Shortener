@@ -126,15 +126,9 @@
             const mainContainer = document.getElementById('mainContainer');
             const urlParams = new URLSearchParams(window.location.search);
             const shortCodeFromQuery = urlParams.get('url');
-
-            // WARNING: Storing API keys directly in client-side JS is INSECURE for production.
-            // This is for demonstration to meet the "no package.json" and "frontend API key" request.
-            // For a real app, you would proxy requests or use a more robust auth.
-            const FRONTEND_API_KEY = "YOUR_SUPER_SECRET_GENERATE_API_KEY"; // <<<--- IMPORTANT: REPLACE THIS!
+            const FRONTEND_API_KEY = "fetch(./api/getAPIkey)Y";
 
             if (shortCodeFromQuery) {
-                // This part of index.html is for displaying info when a query param is used.
-                // The actual redirection for /shortcode paths will be handled by api/redirect.js
                 mainContainer.innerHTML = `
                     <h1>Redirecting...</h1>
                     <p class="info-message">
